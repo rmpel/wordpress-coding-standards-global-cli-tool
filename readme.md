@@ -1,4 +1,4 @@
-# WP Coding standards (and PHP Coding standards) CLI tool
+# WP (and PHP) Coding standards CLI tool
 
 ## How to install
 
@@ -6,7 +6,7 @@
 * Include the path to this repo in your PATH, for example, add the following to your `.bashrc` or `.zshrc` file.
 
 ```
-PATH="/path/to/this/repo":$PATH
+PATH="/path/to/this/repo:$PATH"
 ```
 
 ## How to use
