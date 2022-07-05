@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+CURCWD=$(pwd -P)
+MYCWD="$(dirname "$0")"
+PHPXSXML="wordpress"
+PHPXSXML_SOURCE=""
+PHPXSXML_TMP=""
+
+if [ ! -d "${MYCWD}/vendor" ]; then
+	pushd MYCWD
+	composer install
+	popd
+fi
+
+PARAM=$1
+
+if [ "watch" = "$PARAM" ]; then
+	if [ "" = "$(which watch)" ]; then
+		if [ "" = "$(which brew)" ]; then
+			echo "HomeBrew not available, ignoring 'watch'"
+			PARAM=""
+		else
+			brew install watch
+		fi
+	fi
+fi
+		
+[ -f "phpcs.xml" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml"
+[ -f "phpcs.xml.dist" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml.dist"
+
+if [ "" != "$PHPXSXML_SOURCE" ]; then
+	PHPXSXML_TMP="${CURCWD}/phpcs.xml.phpcw".$$
+	cp "$PHPXSXML_SOURCE" "$PHPXSXML_TMP"
+	# Remove this as we already do this and this line will cause errors.
+	cat "$PHPXSXML_TMP" | sed 's@<rule ref="PHPCompatibilityWP"/>@@' > "$PHPXSXML_SOURCE"
+	PHPXSXML="$PHPXSXML_SOURCE"
+fi
+
+cd "$(dirname "$0")"
+
+if [ "fix" = "$PARAM" ]; then
+	./vendor/bin/phpcbf --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD"
+elif [ "watch" = "$PARAM" ]; then
+	watch ./vendor/bin/phpcs --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD" 
+else
+	./vendor/bin/phpcs --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD"
+fi
+
+if [ -f "$PHPXSXML_TMP" ]; then
+	mv "$PHPXSXML_TMP" "$PHPXSXML_SOURCE"
+fi
