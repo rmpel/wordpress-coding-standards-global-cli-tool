@@ -41,7 +41,7 @@ cd "$(dirname "$0")"
 if [ "fix" = "$PARAM" ]; then
 	./vendor/bin/phpcbf --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD"
 elif [ "watch" = "$PARAM" ]; then
-	watch ./vendor/bin/phpcs --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD" 
+	watch ./vendor/bin/phpcs --standard='"'$PHPXSXML'"' --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules '"'$CURCWD'"'
 else
 	./vendor/bin/phpcs --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD"
 fi
