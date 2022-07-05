@@ -7,7 +7,7 @@ PHPXSXML_SOURCE=""
 PHPXSXML_TMP=""
 
 if [ ! -d "${MYCWD}/vendor" ]; then
-	pushd MYCWD
+	pushd "$MYCWD"
 	composer install
 	popd
 fi
@@ -24,7 +24,7 @@ if [ "watch" = "$PARAM" ]; then
 		fi
 	fi
 fi
-		
+
 [ -f "phpcs.xml" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml"
 [ -f "phpcs.xml.dist" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml.dist"
 

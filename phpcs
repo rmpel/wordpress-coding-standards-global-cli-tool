@@ -7,7 +7,7 @@ PHPXSXML_SOURCE=""
 PHPXSXML_TMP=""
 
 if [ ! -d "${MYCWD}/vendor" ]; then
-	pushd MYCWD
+	pushd "$MYCWD"
 	composer install
 	popd
 fi
