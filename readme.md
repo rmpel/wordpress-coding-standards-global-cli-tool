@@ -20,6 +20,10 @@ PATH="/path/to/this/repo:$PATH"
 PHPCS and the WordPress coding standards are NOT compatible with PHP 8 or higher. You need PHP 7.4 for this to run.
 If php 8.x is detected, the software will try to use 7.4, if installed.
 
+## Related project
+
+[Here is a .editorconfig file](https://gist.github.com/rmpel/a54ffc349ecdba57c5dd7f33b81263dd) that contains nearly everything you need for auto-formatting by WordPress coding standards. It contains rules for IntelliJ editors (phpStorm, webStorm) as well. Request to Visual Studio Code users; please augment this file with rules for VSCode by pull-request.
+
 ## Final note
 
 This is experimental software that has only been proven to work on the computers of myself and two coworkers. If you have problems, try to fix them yourself and issue a pull-request.
