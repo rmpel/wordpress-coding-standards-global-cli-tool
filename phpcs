@@ -12,6 +12,8 @@ if [ ! -d "${MYCWD}/vendor" ]; then
 	popd
 fi
 
+VERSION=8
+
 BREW_PRESENT=yes
 [ "" = "$(which brew)" ] && BREW_PRESENT=no
 
@@ -41,6 +43,7 @@ fi
 PARAM=$1
 
 if [ "watch" = "$PARAM" ]; then
+	shift
 	if [ "" = "$(which watch)" ]; then
 		if [ "no" = "$BREW_PRESENT" ]; then
 			echo "HomeBrew not available, ignoring 'watch'"
@@ -64,12 +67,16 @@ fi
 
 cd "$(dirname "$0")"
 
+TO_SCAN="$1"
+[ "$TO_SCAN" = "" ] && TO_SCAN="$CURCWD"
+[ ! -e "$TO_SCAN" ] && [ -e "$CURCWD/$TO_SCAN" ] && TO_SCAN="$CURCWD/$TO_SCAN"
+
 if [ "fix" = "$PARAM" ]; then
-	./vendor/bin/phpcbf --standard="$PHPXSXML" --runtime-set testVersion $VERSION --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD"
+	./vendor/bin/phpcbf --standard="$PHPXSXML" --runtime-set testVersion $VERSION --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$TO_SCAN"
 elif [ "watch" = "$PARAM" ]; then
-	watch ./vendor/bin/phpcs --standard='"'$PHPXSXML'"' --runtime-set testVersion $VERSION --extensions=php -sd memory_limit=1G  --ignore=vendor --ignore=node_modules '"'$CURCWD'"'
+	watch ./vendor/bin/phpcs --standard='"'$PHPXSXML'"' --runtime-set testVersion $VERSION --extensions=php -sd memory_limit=1G  --ignore=vendor --ignore=node_modules '"'$TO_SCAN'"'
 else
-	./vendor/bin/phpcs --standard="$PHPXSXML" --runtime-set testVersion $VERSION --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$CURCWD"
+	./vendor/bin/phpcs --standard="$PHPXSXML" --runtime-set testVersion $VERSION --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$TO_SCAN"
 fi
 
 if [ -f "$PHPXSXML_TMP" ]; then
