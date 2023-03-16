@@ -52,6 +52,10 @@ if [ "watch" = "$PARAM" ]; then
 	fi
 fi
 
+if [ "fix" = "$PARAM" ]; then
+	shift;
+fi
+
 [ -f "phpcs.xml" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml"
 [ -f "phpcs.xml.dist" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml.dist"
 
