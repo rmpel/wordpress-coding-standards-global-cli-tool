@@ -18,27 +18,27 @@ BREW_PRESENT=yes
 [ "" = "$(which brew)" ] && BREW_PRESENT=no
 
 ORGPATH="$PATH"
-
-if [ "PHP 8" = "$(php --version | egrep -o 'PHP\ 8')" ]; then
-	if [ "no" = "$BREW_PRESENT" ]; then
-		echo "PHP 8.x is currently installed and HomeBrew is not available to provide an alternative."
-		echo "PHPCS is NOT compatible with PHP 8.x."
-		echo "Cannot continue."
-		exit 2;
-	else
-		PHP_PATH=$(brew list php@7.4 | egrep '/bin/php$')
-		if [ "" != "$PHP_PATH" ]; then
-			PHP_PATH=$(dirname "$PHP_PATH")
-			export PATH="$PHP_PATH/:$PATH"
-		else
-			echo "PHP 8.x is currently linked, and PHP 7.4 is not found."
-			echo "PHPCS is NOT compatible with PHP 8.x."
-			echo "Please install and link php@7.4:      brew install php@7.4 "
-			echo "And optionally link as default PHP:   brew unlink php ; brew link php@7.4"
-			exit 1;
-		fi
-	fi
-fi
+#
+#if [ "PHP 8" = "$(php --version | egrep -o 'PHP\ 8')" ]; then
+#	if [ "no" = "$BREW_PRESENT" ]; then
+#		echo "PHP 8.x is currently installed and HomeBrew is not available to provide an alternative."
+#		echo "PHPCS is NOT compatible with PHP 8.x."
+#		echo "Cannot continue."
+#		exit 2;
+#	else
+#		PHP_PATH=$(brew list php@7.4 | egrep '/bin/php$')
+#		if [ "" != "$PHP_PATH" ]; then
+#			PHP_PATH=$(dirname "$PHP_PATH")
+#			export PATH="$PHP_PATH/:$PATH"
+#		else
+#			echo "PHP 8.x is currently linked, and PHP 7.4 is not found."
+#			echo "PHPCS is NOT compatible with PHP 8.x."
+#			echo "Please install and link php@7.4:      brew install php@7.4 "
+#			echo "And optionally link as default PHP:   brew unlink php ; brew link php@7.4"
+#			exit 1;
+#		fi
+#	fi
+#fi
 
 PARAM=$1
 

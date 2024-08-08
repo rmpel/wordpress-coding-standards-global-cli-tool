@@ -17,27 +17,6 @@ BREW_PRESENT=yes
 
 ORGPATH="$PATH"
 
-if [ "PHP 8" = "$(php --version | egrep -o 'PHP\ 8')" ]; then
-	if [ "no" = "$BREW_PRESENT" ]; then
-		echo "PHP 8.x is currently installed and HomeBrew is not available to provide an alternative."
-		echo "PHPCS is NOT compatible with PHP 8.x."
-		echo "Cannot continue."
-		exit 2;
-	else
-		PHP_PATH=$(brew list php@7.4 | egrep '/bin/php$')
-		if [ "" != "$PHP_PATH" ]; then
-			PHP_PATH=$(dirname "$PHP_PATH")
-			export PATH="$PHP_PATH/:$PATH"
-		else
-			echo "PHP 8.x is currently linked, and PHP 7.4 is not found."
-			echo "PHPCS is NOT compatible with PHP 8.x."
-			echo "Please install and link php@7.4:      brew install php@7.4 "
-			echo "And optionally link as default PHP:   brew unlink php ; brew link php@7.4"
-			exit 1;
-		fi
-	fi
-fi
-
 PARAM=$1
 
 if [ "watch" = "$PARAM" ]; then
@@ -61,6 +40,22 @@ fi
 
 if [ "" != "$PHPXSXML_SOURCE" ]; then
 	PHPXSXML_TMP="${CURCWD}/phpcs.xml.phpcw".$$
+	# Add lines to the file to upgrade the sniffs. Any line with the following list of sniff names will be duplicated and the duplicate will have the new sniff name.
+    # Generic.Arrays.DisallowShortArraySyntax.Found => Universal.Arrays.DisallowShortArraySyntax.Found
+    if grep -q "Universal.Arrays.DisallowShortArraySyntax.Found" "$PHPXSXML_SOURCE"; then
+        # do nothing
+        true
+    else
+        sed -i '' '/Generic.Arrays.DisallowShortArraySyntax.Found/ {p; s/Generic.Arrays.DisallowShortArraySyntax.Found/Universal.Arrays.DisallowShortArraySyntax.Found/ ;}' "$PHPXSXML_SOURCE"
+    fi
+    # WordPress.PHP.DisallowShortTernary.Found => Universal.Operators.DisallowShortTernary.Found
+    if grep -q "Universal.Operators.DisallowShortTernary.Found" "$PHPXSXML_SOURCE"; then
+        # do nothing
+        true
+    else
+        sed -i '' '/WordPress.PHP.DisallowShortTernary.Found/ {p; s/WordPress.PHP.DisallowShortTernary.Found/Universal.Operators.DisallowShortTernary.Found/ ;}' "$PHPXSXML_SOURCE"
+    fi
+
 	cp "$PHPXSXML_SOURCE" "$PHPXSXML_TMP"
 	# Remove this as we already do this and this line will cause errors.
 	cat "$PHPXSXML_TMP" | sed 's@<rule ref="PHPCompatibilityWP"/>@@' > "$PHPXSXML_SOURCE"
