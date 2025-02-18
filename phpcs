@@ -3,6 +3,7 @@
 CURCWD=$(pwd -P)
 MYCWD="$(dirname "$0")"
 PHPXSXML="wordpress"
+PHPXSXML_FORCE=no
 PHPXSXML_SOURCE=""
 PHPXSXML_TMP=""
 
@@ -13,6 +14,15 @@ if [ ! -d "${MYCWD}/vendor" ]; then
 fi
 
 VERSION=8
+
+if [ "compat" = "$1" ]; then
+	PHPXSXML="PHPCompatibility"
+	PHPXSXML_FORCE=yes
+	shift
+	[ "$1" = "-v" ] && VERSION=$2 && shift && shift
+
+	echo "Running PHP Compatibility check with PHP version $VERSION"
+fi
 
 BREW_PRESENT=yes
 [ "" = "$(which brew)" ] && BREW_PRESENT=no
@@ -60,6 +70,8 @@ fi
 
 [ -f "phpcs.xml" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml"
 [ -f "phpcs.xml.dist" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml.dist"
+
+[ "yes" = "$PHPXSXML_FORCE" ] && PHPXSXML_SOURCE=""
 
 if [ "" != "$PHPXSXML_SOURCE" ]; then
 	PHPXSXML_TMP="${CURCWD}/phpcs.xml.phpcs".$$
