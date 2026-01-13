@@ -35,6 +35,16 @@ if [ "fix" = "$PARAM" ]; then
 	shift;
 fi
 
+PHPXSXML_TMP=""
+phpcw_cleanup() {
+	if [ ! -z $PHPXSXML_TMP ] && [ -f "$PHPXSXML_TMP" ]; then
+		mv "$PHPXSXML_TMP" "$PHPXSXML_SOURCE"
+	fi
+}
+
+trap phpcw_cleanup SIGINT
+trap phpcw_cleanup exit
+
 [ -f "phpcs.xml" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml"
 [ -f "phpcs.xml.dist" ] && PHPXSXML_SOURCE="${CURCWD}/phpcs.xml.dist"
 
@@ -64,20 +74,23 @@ fi
 
 cd "$(dirname "$0")"
 
-TO_SCAN="$1"
-[ "$TO_SCAN" = "" ] && TO_SCAN="$CURCWD"
-[ ! -e "$TO_SCAN" ] && [ -e "$CURCWD/$TO_SCAN" ] && TO_SCAN="$CURCWD/$TO_SCAN"
+TO_SCAN=()
+for ARG in "$@"; do
+	[ -z "$ARG" ] && ARG="$CURCWD"
+	[ ! -e "$ARG" ] && [ -e "$CURCWD/$ARG" ] && ARG="$CURCWD/$ARG"
+	[ -e "$ARG" ] && TO_SCAN+=("$ARG")
+done
+[ ${#TO_SCAN[@]} -eq 0 ] && TO_SCAN+=("$CURCWD")
+
 
 if [ "fix" = "$PARAM" ]; then
-	./vendor/bin/phpcbf --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$TO_SCAN"
+	./vendor/bin/phpcbf --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "${TO_SCAN[@]}"
 elif [ "watch" = "$PARAM" ]; then
-	watch ./vendor/bin/phpcs --standard='"'$PHPXSXML'"' --extensions=php -sd memory_limit=1G  --ignore=vendor --ignore=node_modules '"'$TO_SCAN'"'
+	watch --color ./vendor/bin/phpcs --standard='"'$PHPXSXML'"' --extensions=php -sd memory_limit=1G  --ignore=vendor --ignore=node_modules $(printf '"%s" ' "${TO_SCAN[@]}")
 else
-	./vendor/bin/phpcs --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "$TO_SCAN"
+	./vendor/bin/phpcs --standard="$PHPXSXML" --extensions=php -psd memory_limit=1G  --ignore=vendor --ignore=node_modules "${TO_SCAN[@]}"
 fi
 
-if [ -f "$PHPXSXML_TMP" ]; then
-	mv "$PHPXSXML_TMP" "$PHPXSXML_SOURCE"
-fi
+# phpcw_cleanup
 
 export PATH="$ORGPATH"
