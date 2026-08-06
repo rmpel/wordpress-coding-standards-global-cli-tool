@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 
 CURCWD=$(pwd -P)
-MYCWD="$(dirname "$0")"
+
+# Resolve $0 through any symlinks (e.g. ~/.local/bin/phpcw -> this repo) so MYCWD is the real installation dir.
+SELF="$0"
+while [ -L "$SELF" ]; do
+	LINK="$(readlink "$SELF")"
+	case "$LINK" in
+		/*) SELF="$LINK" ;;
+		*) SELF="$(dirname "$SELF")/$LINK" ;;
+	esac
+done
+MYCWD="$(cd "$(dirname "$SELF")" && pwd -P)"
 PHPXSXML="wordpress"
 PHPXSXML_SOURCE=""
 PHPXSXML_TMP=""
@@ -11,6 +21,9 @@ if [ ! -d "${MYCWD}/vendor" ]; then
 	composer install
 	popd
 fi
+
+# Poor-man's updater; checks for updates once a week. Disable with PHPCW_NO_UPDATE_CHECK=1.
+[ -f "${MYCWD}/update-check.sh" ] && . "${MYCWD}/update-check.sh" && phpcw_update_check
 
 BREW_PRESENT=yes
 [ "" = "$(which brew)" ] && BREW_PRESENT=no
@@ -72,7 +85,7 @@ if [ "" != "$PHPXSXML_SOURCE" ]; then
 	PHPXSXML="$PHPXSXML_SOURCE"
 fi
 
-cd "$(dirname "$0")"
+cd "$MYCWD"
 
 TO_SCAN=()
 for ARG in "$@"; do

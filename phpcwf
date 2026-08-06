@@ -1,3 +1,13 @@
 #!/usr/bin/env bash
 
-"$(dirname "$0")"/phpcw fix "$@"
+# Resolve $0 through any symlinks so we find the phpcw that lives next to this script.
+SELF="$0"
+while [ -L "$SELF" ]; do
+	LINK="$(readlink "$SELF")"
+	case "$LINK" in
+		/*) SELF="$LINK" ;;
+		*) SELF="$(dirname "$SELF")/$LINK" ;;
+	esac
+done
+
+"$(dirname "$SELF")"/phpcw fix "$@"
